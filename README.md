@@ -17,7 +17,7 @@ source env/bin/activate
 pip install -r requirements.txt
 
 # run in the hadoop cluster
-python <script>.py -r hadoop hdfs://andromeda.eecs.qmul.ac.uk/data/ethereum/<file_name> > ./out/<output>.txt
+python ./scripts/<script>.py -r hadoop hdfs://andromeda.eecs.qmul.ac.uk/data/ethereum/<file_name> > ./output/<output>.txt
 
 # deactivate the env
 deactivate

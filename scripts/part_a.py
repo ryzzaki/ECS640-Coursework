@@ -17,5 +17,5 @@ class PartA(MRJob):
 
 
 if __name__ == "__main__":
-    PartA.JOBCONF = {'mapreduce.job.reduces': '10'}
+    PartA.JOBCONF = {'mapreduce.job.reduces': '4'}
     PartA.run()
