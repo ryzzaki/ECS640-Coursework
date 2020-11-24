@@ -31,8 +31,7 @@ class PartA(MRJob):
         for value in values:
             total += value[0]
             count += value[1]
-        average = total/count
-        yield (year_month_key, (average, count))
+        yield (year_month_key, (total/count, count))
 
     def reducer(self, year_month_key, values):
         count = 0
@@ -40,8 +39,7 @@ class PartA(MRJob):
         for value in values:
             total += value[0]
             count += value[1]
-        average = total/count
-        yield (year_month_key, (average, count))
+        yield (year_month_key, (total/count, count))
 
 
 if __name__ == "__main__":
