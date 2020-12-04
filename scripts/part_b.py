@@ -21,22 +21,6 @@ class PartB(MRJob):
         except:
             pass
 
-    def combiner_repartition_init(self, address, values):
-        try:
-            has_sc = False
-            transacted_amount = 0
-            # loop through the values and count the transacted amounts in smart contracts
-            for value in values:
-                if value[0] == "tsc":
-                    transacted_amount += value[1]
-                elif value[0] == "sc":
-                    has_sc = True
-            # only yield if this is a smart contract
-            if has_sc is True:
-                yield(address, transacted_amount)
-        except:
-            pass
-
     def reducer_repartition_init(self, address, values):
         try:
             has_sc = False
@@ -75,7 +59,7 @@ class PartB(MRJob):
                 break
 
     def steps(self):
-        return [MRStep(mapper=self.mapper_repartition_init, combiner=self.combiner_repartition_init, reducer=self.reducer_repartition_init), MRStep(mapper=self.mapper_aggregate, combiner=self.combiner_aggregate, reducer=self.reducer_aggregate)]
+        return [MRStep(mapper=self.mapper_repartition_init, reducer=self.reducer_repartition_init), MRStep(mapper=self.mapper_aggregate, combiner=self.combiner_aggregate, reducer=self.reducer_aggregate)]
 
 
 if __name__ == "__main__":
