@@ -7,8 +7,8 @@ class PartB(MRJob):
             # split the block of transaction
             tsc = transaction.split(',')
             to_address = tsc[2]
-            value = tsc[3]
-            if len(tsc) == 7:
+            value = int(tsc[3])
+            if len(tsc) == 7 and value != 0:
                 yield(to_address, value)
         except:
             pass
