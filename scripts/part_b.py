@@ -25,6 +25,7 @@ class PartB(MRJob):
         try:
             has_sc = False
             transacted_amount = 0
+            values = [x for x in values]
             # loop through the values and count the transacted amounts in smart contracts
             for value in values:
                 if value[0] == "tsc":
@@ -41,6 +42,7 @@ class PartB(MRJob):
         try:
             has_sc = False
             transacted_amount = 0
+            values = [x for x in values]
             # loop through the values and count the transacted amounts in smart contracts
             for value in values:
                 if value[0] == "tsc":
