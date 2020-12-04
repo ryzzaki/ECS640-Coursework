@@ -10,12 +10,12 @@ class PartB(MRJob):
                 # this is a transaction
                 to_address = splits[2]
                 value = int(splits[3])
-                if value != 0:
-                    yield(to_address, ["tsc", value])
+                if value > 0:
+                    yield(to_address, ("tsc", value))
             elif len(splits) == 5:
                 # this is a contract
                 sc_address = splits[0]
-                yield(sc_address, ["sc", 1])
+                yield(sc_address, ("sc", 1))
             else:
                 pass
         except:
@@ -24,11 +24,14 @@ class PartB(MRJob):
     def combiner_repartition_init(self, address, values):
         try:
             transacted_amount = 0
+            count = 0
             # loop through the values and count the transacted amounts in smart contracts
             for value in values:
                 if value[0] == "tsc":
                     transacted_amount += value[1]
-            yield(address, transacted_amount)
+                elif value[0] == "sc":
+                    count += value[1]
+            yield(address, (("tsc", transacted_amount), ("sc", count)))
         except:
             pass
 
@@ -75,5 +78,5 @@ class PartB(MRJob):
 
 
 if __name__ == "__main__":
-    PartB.JOBCONF = {'mapreduce.job.reduces': '10'}
+    PartB.JOBCONF = {'mapreduce.job.reduces': '4'}
     PartB.run()
