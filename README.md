@@ -22,3 +22,13 @@ python ./scripts/<script>.py -r hadoop hdfs://andromeda.eecs.qmul.ac.uk/data/eth
 # deactivate the env
 deactivate
 ```
+
+## Replication Steps using Pipenv
+
+```bash
+# install the dependencies
+pipenv install -r requirements.txt
+
+# run the *.py files using pipenv
+pipenv python ./scripts/<script>.py
+```
