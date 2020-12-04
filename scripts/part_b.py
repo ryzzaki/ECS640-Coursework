@@ -24,13 +24,11 @@ class PartB(MRJob):
     def combiner_repartition_init(self, address, values):
         try:
             transacted_amount = 0
-            count = 0
+            # loop through the values and count the transacted amounts in smart contracts
             for value in values:
                 if value[0] == "tsc":
                     transacted_amount += value[1]
-                elif value[0] == "sc":
-                    count += value[1]
-            yield(address, [["tsc", transacted_amount], ["sc", count]])
+            yield(address, transacted_amount)
         except:
             pass
 
