@@ -24,10 +24,13 @@ class PartB(MRJob):
     def combiner_repartition_init(self, address, values):
         try:
             transacted_amount = 0
+            count = 0
             for value in values:
-                if value == "tsc":
+                if value[0] == "tsc":
                     transacted_amount += value[1]
-            yield(address, [transacted_amount])
+                elif value[0] == "sc":
+                    count += value[1]
+            yield(address, [["tsc", transacted_amount], ["sc", count]])
         except:
             pass
 
