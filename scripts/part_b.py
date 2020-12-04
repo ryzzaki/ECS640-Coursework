@@ -23,6 +23,16 @@ class PartB(MRJob):
 
     def combiner_repartition_init(self, address, values):
         try:
+            transacted_amount = 0
+            for value in values:
+                if value == "tsc":
+                    transacted_amount += value[1]
+            yield(address, [transacted_amount])
+        except:
+            pass
+
+    def reducer_repartition_init(self, address, values):
+        try:
             has_sc = False
             transacted_amount = 0
             # loop through the values and count the transacted amounts in smart contracts
@@ -36,9 +46,6 @@ class PartB(MRJob):
                 yield(address, transacted_amount)
         except:
             pass
-
-    def reducer_repartition_init(self, address, values):
-        yield(address, sum(values))
 
     def mapper_aggregate(self, address, ts_amount):
         yield(None, (address, ts_amount))
