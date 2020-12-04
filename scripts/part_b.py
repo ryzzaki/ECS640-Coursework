@@ -21,7 +21,7 @@ class PartB(MRJob):
         except:
             pass
 
-    def reducer_repartition_init(self, address, values):
+    def combiner_repartition_init(self, address, values):
         try:
             has_sc = False
             transacted_amount = 0
@@ -36,6 +36,9 @@ class PartB(MRJob):
                 yield(address, transacted_amount)
         except:
             pass
+
+    def reducer_repartition_init(self, address, values):
+        yield(address, sum(values))
 
     def mapper_aggregate(self, address, ts_amount):
         yield(None, (address, ts_amount))
@@ -59,7 +62,7 @@ class PartB(MRJob):
                 break
 
     def steps(self):
-        return [MRStep(mapper=self.mapper_repartition_init, reducer=self.reducer_repartition_init), MRStep(mapper=self.mapper_aggregate, combiner=self.combiner_aggregate, reducer=self.reducer_aggregate)]
+        return [MRStep(mapper=self.mapper_repartition_init, combiner=self.combiner_repartition_init, reducer=self.reducer_repartition_init), MRStep(mapper=self.mapper_aggregate, combiner=self.combiner_aggregate, reducer=self.reducer_aggregate)]
 
 
 if __name__ == "__main__":
