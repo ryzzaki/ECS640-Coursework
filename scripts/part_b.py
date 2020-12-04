@@ -43,7 +43,8 @@ class PartB(MRJob):
                 if value[0] == "tsc":
                     transacted_amount += value[1]
                 elif value[0] == "sc":
-                    has_sc = True
+                    if value[1] > 0:
+                        has_sc = True
             # only yield if this is a smart contract
             if has_sc is True:
                 yield(address, transacted_amount)
@@ -76,5 +77,5 @@ class PartB(MRJob):
 
 
 if __name__ == "__main__":
-    PartB.JOBCONF = {'mapreduce.job.reduces': '4'}
+    PartB.JOBCONF = {'mapreduce.job.reduces': '10'}
     PartB.run()
