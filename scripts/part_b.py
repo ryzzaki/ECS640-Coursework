@@ -2,7 +2,7 @@ from mrjob.job import MRJob
 from mrjob.step import MRStep
 
 
-class PartB_Job1(MRJob):
+class PartB(MRJob):
     def mapper_repartition_init(self, _, row):
         try:
             splits = row.split(',')
@@ -69,7 +69,7 @@ class PartB_Job1(MRJob):
         i = 0
         sorted_values = sorted(values, reverse=True, key=lambda tup: tup[1])
         for value in sorted_values:
-            yield("{} - {}".format(value[0], value[1]), None)
+            yield("{} - {} - {}".format(i, value[0], value[1]), None)
             i += 1
             if i >= 10:
                 break
@@ -79,5 +79,5 @@ class PartB_Job1(MRJob):
 
 
 if __name__ == "__main__":
-    PartB_Job1.JOBCONF = {'mapreduce.job.reduces': '4'}
-    PartB_Job1.run()
+    PartB.JOBCONF = {'mapreduce.job.reduces': '4'}
+    PartB.run()
