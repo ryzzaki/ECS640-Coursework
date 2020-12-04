@@ -2,22 +2,43 @@ from mrjob.job import MRJob
 
 
 class PartB_Job1(MRJob):
-    def mapper(self, _, transaction):
+    def mapper(self, _, row):
         try:
-            # split the block of transaction
-            tsc = transaction.split(',')
-            to_address = tsc[2]
-            value = int(tsc[3])
-            if len(tsc) == 7 and value != 0:
-                yield(to_address, value)
+            splits = row.split(',')
+            if len(splits) == 7:
+                # this is a transaction
+                to_address = splits[2]
+                value = int(splits[3])
+                if value != 0:
+                    yield(to_address, ["tsc", value])
+            elif len(splits) == 5:
+                # this is a contract
+                sc_address = splits[0]
+                is_erc20 = splits[1]
+                is_erc721 = splits[2]
+                yield(sc_address, ["sc", is_erc20, is_erc721])
+            else:
+                pass
         except:
             pass
 
-    def combiner(self, to_address, values):
-        yield (to_address, sum(values))
+    def combiner(self, address, values):
+        values = [x for x in values]
+        if len(values):
+            value_type = values[0]
+            for value in values[1:]:
+                yield(address, [value_type, value])
+        else:
+            pass
 
-    def reducer(self, to_address, values):
-        yield (to_address, sum(values))
+    def reducer(self, address, values):
+        values = [x for x in values]
+        if len(values):
+            value_type = values[0]
+            for value in values[1:]:
+                yield(address, [value_type, value])
+        else:
+            pass
 
 
 if __name__ == "__main__":
