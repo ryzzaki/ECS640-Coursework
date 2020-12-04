@@ -15,7 +15,7 @@ class PartB(MRJob):
             elif len(splits) == 5:
                 # this is a contract
                 sc_address = splits[0]
-                yield(sc_address, "sc")
+                yield(sc_address, ["sc", 1])
             else:
                 pass
         except:
@@ -25,7 +25,6 @@ class PartB(MRJob):
         try:
             has_sc = False
             transacted_amount = 0
-            values = [x for x in values]
             # loop through the values and count the transacted amounts in smart contracts
             for value in values:
                 if value[0] == "tsc":
@@ -42,7 +41,6 @@ class PartB(MRJob):
         try:
             has_sc = False
             transacted_amount = 0
-            values = [x for x in values]
             # loop through the values and count the transacted amounts in smart contracts
             for value in values:
                 if value[0] == "tsc":
