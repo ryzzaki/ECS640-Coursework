@@ -8,7 +8,7 @@ class PartB_Job1(MRJob):
             if len(splits) == 7:
                 to_address = splits[2]
                 value = int(splits[3])
-                if value != 0:
+                if value > 0:
                     yield(to_address, value)
         except:
             pass
