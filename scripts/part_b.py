@@ -13,7 +13,7 @@ class PartB(MRJob):
                 if value > 0:
                     yield(to_address, ("tsc", value))
             elif len(splits) == 5:
-                # this is a contract
+                # this is a smart contract
                 sc_address = splits[0]
                 yield(sc_address, ("sc", 1))
             else:
@@ -23,15 +23,18 @@ class PartB(MRJob):
 
     def combiner_repartition_init(self, address, values):
         try:
-            transacted_amount = 0
-            count = 0
-            # loop through the values and count the transacted amounts in smart contracts
-            for value in values:
-                if value[0] == "tsc":
-                    transacted_amount += value[1]
-                elif value[0] == "sc":
-                    count += value[1]
-            yield(address, (("tsc", transacted_amount), ("sc", count)))
+            values = [x for x in values]
+            data_types = {}
+            for list in values:
+                key = list[0]
+                vals = list[1]
+                if key in data_types:
+                    data_types[key] = [sum(v)
+                                       for v in zip(data_types[key], vals)]
+                else:
+                    data_types[key] = vals
+            for data_type in data_types.items():
+                yield(address, data_type)
         except:
             pass
 
@@ -39,11 +42,12 @@ class PartB(MRJob):
         try:
             has_sc = False
             transacted_amount = 0
+            values = [x for x in values]
             # loop through the values and count the transacted amounts in smart contracts
             for value in values:
                 if value[0] == "tsc":
                     transacted_amount += value[1]
-                elif value[0] == "sc":
+                elif value[0] == "sc" and has_sc is False:
                     if value[1] > 0:
                         has_sc = True
             # only yield if this is a smart contract
