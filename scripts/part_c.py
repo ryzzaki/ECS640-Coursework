@@ -45,12 +45,9 @@ class PartC(MRJob):
             pass
 
     def mapper_size_aggregate(self, _, values):
-        try:
-            for value in values:
-                # yield the miner as the key
-                yield(value[0], value[1])
-        except:
-            pass
+        for value in values:
+            # yield the miner as the key
+            yield(value[0], value[1])
 
     def combiner_size_aggregate(self, miner, sizes):
         yield(miner, sum(sizes))
