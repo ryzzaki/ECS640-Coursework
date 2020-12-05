@@ -72,13 +72,16 @@ class PartB(MRJob):
         i = 0
         sorted_values = sorted(values, reverse=True, key=lambda tup: tup[1])
         for value in sorted_values:
-            yield("{} - {} - {}".format(i, value[0], value[1]), None)
             i += 1
+            yield("{} - {} - {}".format(i, value[0], value[1]), None)
             if i >= 10:
                 break
 
     def steps(self):
-        return [MRStep(mapper=self.mapper_repartition_init, combiner=self.combiner_repartition_init, reducer=self.reducer_repartition_init), MRStep(mapper=self.mapper_aggregate, combiner=self.combiner_aggregate, reducer=self.reducer_aggregate)]
+        return [MRStep(mapper=self.mapper_repartition_init,
+                       combiner=self.combiner_repartition_init, reducer=self.reducer_repartition_init),
+                MRStep(mapper=self.mapper_aggregate,
+                       combiner=self.combiner_aggregate, reducer=self.reducer_aggregate)]
 
 
 if __name__ == "__main__":
