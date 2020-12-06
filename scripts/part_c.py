@@ -5,8 +5,12 @@ from mrjob.step import MRStep
 class PartC(MRJob):
     def mapper_block_aggregate(self, _, mined_block):
         try:
-            [block_num, _, miner, _, size] = mined_block.split(',')
-            yield(block_num, (miner, int(size)))
+            splits = mined_block.split(',')
+            block_num = str(splits[0])
+            miner = splits[2]
+            size = int(splits[4])
+            if block_num.isnumeric() is True:
+                yield(block_num, (miner, size))
         except:
             pass
 
@@ -45,9 +49,8 @@ class PartC(MRJob):
             pass
 
     def mapper_size_aggregate(self, _, values):
-        for value in values:
-            # yield the miner as the key
-            yield(value[0], value[1])
+        values = [x for x in values]
+        yield(values[0], values[1])
 
     def combiner_size_aggregate(self, miner, sizes):
         yield(miner, sum(sizes))
