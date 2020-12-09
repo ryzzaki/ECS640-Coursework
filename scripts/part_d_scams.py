@@ -11,7 +11,7 @@ class PartD(MRJob):
 
     def mapper_join_init(self):
         base_path = Path(__file__).parent
-        scams_json_path = (base_path / "../input/scams.json").resolve()
+        scams_json_path = (base_path / "./input/scams.json").resolve()
         with open(scams_json_path) as f:
             parsed_json = json.loads(f.readline())
             self.scams_json = parsed_json["result"].items()
