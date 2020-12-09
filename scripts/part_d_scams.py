@@ -5,14 +5,13 @@ import json
 
 
 class PartD(MRJob):
-    scams_json = {}
     eth_scams = {}
 
     def mapper_join_init(self):
         with open('scams.json') as f:
             parsed_json = json.loads(f.readline())
-            self.scams_json = parsed_json["result"].items()
-            for _, v in self.scams_json:
+            scams_json = parsed_json["result"].items()
+            for _, v in scams_json:
                 category = v["category"]
                 coin = v["coin"]
                 addresses = v["addresses"]
