@@ -1,7 +1,6 @@
 from mrjob.job import MRJob
 from mrjob.step import MRStep
 from datetime import datetime
-from pathlib import Path
 import json
 
 
@@ -10,9 +9,7 @@ class PartD(MRJob):
     eth_scams = {}
 
     def mapper_join_init(self):
-        base_path = Path(__file__).parent
-        scams_json_path = (base_path / "./input/scams.json").resolve()
-        with open(scams_json_path) as f:
+        with open('scams.json') as f:
             parsed_json = json.loads(f.readline())
             self.scams_json = parsed_json["result"].items()
             for _, v in self.scams_json:
