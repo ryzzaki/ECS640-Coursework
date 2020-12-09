@@ -15,38 +15,32 @@ class PartC(MRJob):
             pass
 
     def combiner_block_aggregate(self, block_num, values):
-        try:
-            values = [x for x in values]
-            data_types = {}
-            for list in values:
-                key = list[0]
-                vals = list[1]
-                if key in data_types:
-                    data_types[key] = [sum(v)
-                                       for v in zip(data_types[key], vals)]
-                else:
-                    data_types[key] = vals
-            for data_type in data_types.items():
-                yield(block_num, data_type)
-        except:
-            pass
+        values = [x for x in values]
+        data_types = {}
+        for arr in values:
+            key = arr[0]
+            vals = [arr[1]]
+            if key in data_types:
+                data_types[key] = [sum(v)
+                                   for v in zip(data_types[key], vals)]
+            else:
+                data_types[key] = vals
+        for data_type in data_types.items():
+            yield(block_num, (data_type[0], data_type[1].pop()))
 
     def reducer_block_aggregate(self, block_num, values):
-        try:
-            values = [x for x in values]
-            data_types = {}
-            for list in values:
-                key = list[0]
-                vals = list[1]
-                if key in data_types:
-                    data_types[key] = [sum(v)
-                                       for v in zip(data_types[key], vals)]
-                else:
-                    data_types[key] = vals
-            for data_type in data_types.items():
-                yield(block_num, data_type)
-        except:
-            pass
+        values = [x for x in values]
+        data_types = {}
+        for arr in values:
+            key = arr[0]
+            vals = [arr[1]]
+            if key in data_types:
+                data_types[key] = [sum(v)
+                                   for v in zip(data_types[key], vals)]
+            else:
+                data_types[key] = vals
+        for data_type in data_types.items():
+            yield(block_num, (data_type[0], data_type[1].pop()))
 
     def mapper_size_aggregate(self, _, values):
         values = [x for x in values]

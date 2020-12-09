@@ -22,39 +22,33 @@ class PartB(MRJob):
             pass
 
     def combiner_repartition_init(self, address, values):
-        try:
-            values = [x for x in values]
-            data_types = {}
-            for list in values:
-                key = list[0]
-                vals = list[1]
-                if key in data_types:
-                    data_types[key] = [sum(v)
-                                       for v in zip(data_types[key], vals)]
-                else:
-                    data_types[key] = vals
-            for data_type in data_types.items():
-                yield(address, data_type)
-        except:
-            pass
+        values = [x for x in values]
+        data_types = {}
+        for arr in values:
+            key = arr[0]
+            vals = [arr[1]]
+            if key in data_types:
+                data_types[key] = [sum(v)
+                                   for v in zip(data_types[key], vals)]
+            else:
+                data_types[key] = vals
+        for data_type in data_types.items():
+            yield(address, (data_type[0], data_type[1].pop()))
 
     def reducer_repartition_init(self, address, values):
-        try:
-            has_sc = False
-            transacted_amount = 0
-            values = [x for x in values]
-            # loop through the values and count the transacted amounts in smart contracts
-            for value in values:
-                if value[0] == "tsc":
-                    transacted_amount += value[1]
-                elif value[0] == "sc" and has_sc is False:
-                    if value[1] > 0:
-                        has_sc = True
-            # only yield if this is a smart contract
-            if has_sc is True:
-                yield(address, transacted_amount)
-        except:
-            pass
+        has_sc = False
+        transacted_amount = 0
+        values = [x for x in values]
+        # loop through the values and count the transacted amounts in smart contracts
+        for value in values:
+            if value[0] == "tsc":
+                transacted_amount += value[1]
+            elif value[0] == "sc" and has_sc is False:
+                if value[1] > 0:
+                    has_sc = True
+        # only yield if this is a smart contract
+        if has_sc is True:
+            yield(address, transacted_amount)
 
     def mapper_aggregate(self, address, ts_amount):
         yield(None, (address, ts_amount))
