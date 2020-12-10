@@ -58,7 +58,8 @@ class PartD(MRJob):
         # only yield if this is a smart contract
         if has_sc is True:
             for data_type in data_types.items():
-                yield(data_type[0], data_type[1].pop())
+                if data_type[0] != "sc":
+                    yield(data_type[0], data_type[1].pop())
 
     def mapper_month_aggregate(self, year_month_key, tsc_cost):
         yield(year_month_key, tsc_cost)
