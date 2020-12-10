@@ -17,7 +17,7 @@ class PartD(MRJob):
                 data_types[key] = vals
         return data_types
 
-    def mapper(self, _, row):
+    def mapper_address_aggregate(self, _, row):
         try:
             splits = row.split(',')
             if len(splits) == 7:
@@ -41,13 +41,14 @@ class PartD(MRJob):
         except:
             pass
 
-    def combiner(self, address, values):
+    def combiner_address_aggregate(self, address, values):
         data_types = self.reduce_values_by_local_key(values)
         for data_type in data_types.items():
             yield(address, (data_type[0], data_type[1].pop()))
 
-    def reducer(self, address, values):
+    def reducer_address_aggregate(self, address, values):
         has_sc = False
+        values = [x for x in values]
         # loop through the values and count the transacted amounts in smart contracts
         for value in values:
             if value[0] == "sc":
@@ -56,8 +57,23 @@ class PartD(MRJob):
         data_types = self.reduce_values_by_local_key(values)
         # only yield if this is a smart contract
         if has_sc is True:
-            for data_type in data_types:
+            for data_type in data_types.items():
                 yield(data_type[0], data_type[1].pop())
+
+    def mapper_month_aggregate(self, year_month_key, tsc_cost):
+        yield(year_month_key, tsc_cost)
+
+    def combiner_month_aggregate(self, year_month_key, tsc_cost):
+        yield(year_month_key, sum(tsc_cost))
+
+    def reducer_month_aggregate(self, year_month_key, tsc_cost):
+        yield(year_month_key, sum(tsc_cost))
+
+    def steps(self):
+        return [MRStep(mapper=self.mapper_address_aggregate, combiner=self.combiner_address_aggregate,
+                       reducer=self.reducer_address_aggregate),
+                MRStep(mapper=self.mapper_month_aggregate, combiner=self.combiner_month_aggregate,
+                       reducer=self.reducer_month_aggregate)]
 
 
 if __name__ == "__main__":
