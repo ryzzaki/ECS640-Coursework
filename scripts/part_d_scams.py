@@ -7,6 +7,19 @@ import json
 class PartD(MRJob):
     eth_scams = {}
 
+    def reduce_values_by_local_key(self, values):
+        values = [x for x in values]
+        data_types = {}
+        for arr in values:
+            key = arr[0]
+            vals = [arr[1]]
+            if key in data_types:
+                data_types[key] = [sum(v)
+                                   for v in zip(data_types[key], vals)]
+            else:
+                data_types[key] = vals
+        return data_types
+
     def mapper_join_init(self):
         with open('scams.json') as f:
             parsed_json = json.loads(f.readline())
@@ -39,30 +52,12 @@ class PartD(MRJob):
             pass
 
     def combiner_category_aggregate(self, category, values):
-        values = [x for x in values]
-        data_types = {}
-        for arr in values:
-            key = arr[0]
-            vals = [arr[1]]
-            if key in data_types:
-                data_types[key] = [sum(v)
-                                   for v in zip(data_types[key], vals)]
-            else:
-                data_types[key] = vals
+        data_types = self.reduce_values_by_local_key(values)
         for data_type in data_types.items():
             yield(category, (data_type[0], data_type[1].pop()))
 
     def reducer_category_aggregate(self, category, values):
-        values = [x for x in values]
-        data_types = {}
-        for arr in values:
-            key = arr[0]
-            vals = [arr[1]]
-            if key in data_types:
-                data_types[key] = [sum(v)
-                                   for v in zip(data_types[key], vals)]
-            else:
-                data_types[key] = vals
+        data_types = self.reduce_values_by_local_key(values)
         for data_type in data_types.items():
             yield(category, (data_type[0], data_type[1].pop()))
 
@@ -70,30 +65,12 @@ class PartD(MRJob):
         yield(values[0], (category, values[1]))
 
     def combiner_month_aggregate(self, year_month_key, values):
-        values = [x for x in values]
-        data_types = {}
-        for arr in values:
-            key = arr[0]
-            vals = [arr[1]]
-            if key in data_types:
-                data_types[key] = [sum(v)
-                                   for v in zip(data_types[key], vals)]
-            else:
-                data_types[key] = vals
+        data_types = self.reduce_values_by_local_key(values)
         for data_type in data_types.items():
             yield(year_month_key, (data_type[0], data_type[1].pop()))
 
     def reducer_month_aggregate(self, year_month_key, values):
-        values = [x for x in values]
-        data_types = {}
-        for arr in values:
-            key = arr[0]
-            vals = [arr[1]]
-            if key in data_types:
-                data_types[key] = [sum(v)
-                                   for v in zip(data_types[key], vals)]
-            else:
-                data_types[key] = vals
+        data_types = self.reduce_values_by_local_key(values)
         scams = []
         for data_type in data_types.items():
             scams.append((data_type[0], data_type[1].pop()))
