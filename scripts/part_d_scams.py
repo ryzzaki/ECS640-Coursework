@@ -23,7 +23,7 @@ class PartD(MRJob):
                         self.eth_scams[category] = addresses
             f.close()
 
-    def mapper_join(self, _, transaction):
+    def mapper_category_aggregate(self, _, transaction):
         try:
             # split the block of transaction
             tsc = transaction.split(',')
@@ -33,21 +33,12 @@ class PartD(MRJob):
             # convert the timestamp into a unified format of %month/%year (e.g. 10/2020)
             year_month_key = datetime.utcfromtimestamp(
                 block_timestamp).strftime('%m/%Y')
-            # yield the value with the count of 1
-            yield(to_address, (year_month_key, value))
+            for k, v in self.eth_scams.items():
+                if to_address in set(v):
+                    # yields (year_month_key, (category, value))
+                    yield(year_month_key, (k, value))
         except:
             pass
-
-    def reducer_join(self, to_address, values):
-        values = [x for x in values]
-        for k, v in self.eth_scams.items():
-            if to_address in set(v):
-                # yields (year_month_key, (category, value))
-                for entry in values:
-                    yield(entry[0], (k, entry[1]))
-
-    def mapper_category_aggregate(self, year_month_key, values):
-        yield(year_month_key, values)
 
     def combiner_category_aggregate(self, year_month_key, values):
         values = [x for x in values]
@@ -78,7 +69,7 @@ class PartD(MRJob):
             yield(year_month_key, (data_type[0], data_type[1].pop()))
 
     def steps(self):
-        return [MRStep(mapper_init=self.mapper_join_init, mapper=self.mapper_join, reducer=self.reducer_join), MRStep(mapper=self.mapper_category_aggregate, combiner=self.combiner_category_aggregate, reducer=self.reducer_category_aggregate)]
+        return [MRStep(mapper_init=self.mapper_join_init, mapper=self.mapper_category_aggregate, combiner=self.combiner_category_aggregate, reducer=self.reducer_category_aggregate)]
 
 
 if __name__ == "__main__":
