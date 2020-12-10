@@ -39,10 +39,12 @@ class PartD(MRJob):
             pass
 
     def reducer_join(self, to_address, values):
+        values = [x for x in values]
         for k, v in self.eth_scams.items():
             if to_address in v:
                 # yields (year_month_key, (category, value))
-                yield(values[0], (k, values[1]))
+                for entry in values:
+                    yield(entry[0], (k, entry[1]))
 
     def mapper_category_aggregate(self, year_month_key, values):
         yield(year_month_key, values)
