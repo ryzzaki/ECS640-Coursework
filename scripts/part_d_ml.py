@@ -8,24 +8,13 @@ sc = SparkContext()
 sparkSession = SparkSession.builder.getOrCreate()
 
 
-def is_good_line(line):
-    try:
-        splits = line.split(',')
-        if len(splits) != 5:
-            return False
-        float(splits[1])
-        float(splits[2])
-        float(splits[3])
-        float(splits[4])
-        return True
-    except:
-        return False
-
-
-data = sparkSession.read.csv(
+df = sparkSession.read.csv(
     "hdfs://andromeda.eecs.qmul.ac.uk/user/vcn01/input/eth_price_inception_to_11_dec.csv", header=True, inferSchema=True)
 
-clean_data = data.filter(is_good_line)
+clean_data = df.filter((df.open != "undefined") & (df.high != "undefined") & (
+    df.low != "undefined") & (df.close != "undefined"))
+
+clean_data.show()
 
 # create features vector
 feature_columns = clean_data.columns[:-1]  # here we omit the final column
