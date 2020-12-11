@@ -49,7 +49,8 @@ def mapper(line):
 
 
 # import the transactions and prices
-transactions = sc.textFile("/data/ethereum/transactions/")
+transactions = sc.textFile(
+    "hdfs://andromeda.eecs.qmul.ac.uk/data/ethereum/transactions")
 prices = sc.textFile("input/eth_price_inception_to_11_dec.csv")
 
 # clean the dataset
