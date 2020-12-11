@@ -62,5 +62,13 @@ dates_and_prices = clean_prices_lines.map(mapper).reduceByKey(lambda a: sum(a))
 # join => (date, (value, price))
 joined_dates = dates_and_values.join(dates_and_prices)
 
+print(joined_dates)
+train, test = joined_dates.randomSplit([0.7, 0.3])
+algo = pyspark.ml.regression.LinearRegression(
+    featuresCol="features", labelCol="medv")
+model = algo.fit(train)
+evaluation_summary = model.evaluate(test)
+print(evaluation_summary.r2)
+
 # linearModel = LinearRegressionWithSGD.train(joined_dates, 1000, .2)
 # or use pyspark.ml.regression.LinearRegression()?
