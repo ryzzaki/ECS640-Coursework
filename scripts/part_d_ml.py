@@ -1,76 +1,31 @@
-import pyspark
+from pyspark.ml.feature import VectorAssembler
+from pyspark import SparkContext
+from pyspark.sql import SparkSession
 from pyspark.ml.regression import LinearRegression
 from datetime import datetime
 
-sc = pyspark.SparkContext()
+sc = SparkContext()
+sparkSession = SparkSession.builder.getOrCreate()
 
+data = sparkSession.read.csv(
+    "hdfs://andromeda.eecs.qmul.ac.uk/user/vcn01/input/eth_price_inception_to_11_dec.csv", header=True, inferSchema=True)
 
-def is_good_tsc_line(line):
-    try:
-        splits = line.split(',')
-        if len(splits) != 7:
-            return False
-        # tsc value
-        float(splits[3])
-        # timestamp
-        float(splits[-1])
-        return True
-    except:
-        return False
-
-
-def is_good_price_line(line):
-    try:
-        splits = line.split(',')
-        if len(splits) != 5:
-            return False
-        # timestamp
-        int(splits[0])
-        # open price
-        int(splits[1])
-        return True
-    except:
-        return False
-
-
-def mapper(line):
-    splits = line.split(',')
-    if len(splits) == 7:
-        value = int(splits[3])
-        block_timestamp = splits[-1]
-        date = datetime.utcfromtimestamp(
-            block_timestamp).strftime('%d/%m/%Y')
-    else:
-        value = int(splits[1])
-        block_timestamp = splits[0]
-        date = datetime.utcfromtimestamp(
-            block_timestamp).strftime('%d/%m/%Y')
-    return (date, value)
-
-
-# import the transactions and prices
-transactions = sc.textFile(
-    "hdfs://andromeda.eecs.qmul.ac.uk/data/ethereum/transactions")
-prices = sc.textFile("input/eth_price_inception_to_11_dec.csv")
-
-# clean the dataset
-clean_tsc_lines = transactions.filter(is_good_tsc_line)
-clean_prices_lines = prices.filter(is_good_price_line)
-
-# map & reduce
-dates_and_values = clean_tsc_lines.map(mapper).reduceByKey(lambda a: sum(a))
-dates_and_prices = clean_prices_lines.map(mapper).reduceByKey(lambda a: sum(a))
-
-# join => (date, (value, price))
-joined_dates = dates_and_values.join(dates_and_prices)
-
-print(joined_dates)
-train, test = joined_dates.randomSplit([0.7, 0.3])
-algo = LinearRegression(
-    featuresCol="features", labelCol="medv")
+# create features vector
+feature_columns = data.columns[:-1]  # here we omit the final column
+assembler = VectorAssembler(inputCols=feature_columns, outputCol="features")
+data_2 = assembler.transform(data)
+# train/test split
+train, test = data_2.randomSplit([0.7, 0.3])
+# define the model
+algo = LinearRegression(featuresCol="features", labelCol="open_prices")
+# train the model
 model = algo.fit(train)
+# evaluation
 evaluation_summary = model.evaluate(test)
-print(evaluation_summary.r2)
-
-# linearModel = LinearRegressionWithSGD.train(joined_dates, 1000, .2)
-# or use pyspark.ml.regression.LinearRegression()?
+evaluation_summary.meanAbsoluteError
+evaluation_summary.rootMeanSquaredError
+evaluation_summary.r2
+# predicting values
+predictions = model.transform(test)
+# here I am filtering out some columns just for the figure to fit
+predictions.select(predictions.columns[13:]).show()
