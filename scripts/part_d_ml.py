@@ -1,6 +1,5 @@
 import pyspark
 from datetime import datetime
-from pathlib import Path
 
 sc = pyspark.SparkContext()
 
