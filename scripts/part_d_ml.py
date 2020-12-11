@@ -9,11 +9,15 @@ sparkSession = SparkSession.builder.getOrCreate()
 
 
 df = sparkSession.read.csv(
-    "hdfs://andromeda.eecs.qmul.ac.uk/user/vcn01/input/eth_price_inception_to_11_dec.csv", header=True, inferSchema=True)
+    "hdfs://andromeda.eecs.qmul.ac.uk/user/vcn01/input/eth_price_inception_to_11_dec.csv", header=True, inferSchema=False)
 
 clean_data = df.filter((df.open != "undefined") & (df.high != "undefined") & (
     df.low != "undefined") & (df.close != "undefined"))
 
+clean_data = clean_data.withColumn("open", clean_data.open.cast('float'))
+clean_data = clean_data.withColumn("high", clean_data.open.cast('float'))
+clean_data = clean_data.withColumn("low", clean_data.open.cast('float'))
+clean_data = clean_data.withColumn("close", clean_data.open.cast('float'))
 clean_data.show()
 
 # create features vector
