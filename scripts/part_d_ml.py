@@ -1,4 +1,5 @@
 import pyspark
+from pyspark.ml.regression import LinearRegression
 from datetime import datetime
 
 sc = pyspark.SparkContext()
@@ -64,7 +65,7 @@ joined_dates = dates_and_values.join(dates_and_prices)
 
 print(joined_dates)
 train, test = joined_dates.randomSplit([0.7, 0.3])
-algo = pyspark.ml.regression.LinearRegression(
+algo = LinearRegression(
     featuresCol="features", labelCol="medv")
 model = algo.fit(train)
 evaluation_summary = model.evaluate(test)
