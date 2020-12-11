@@ -18,6 +18,7 @@ toml = "==0.10.2"
 wrapt = "==1.12.1"
 PyYAML = "==5.3.1"
 matplotlib = "*"
+pyspark = "*"
 
 [dev-packages]
 
