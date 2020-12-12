@@ -15,13 +15,15 @@ df = sparkSession.read.csv(
 clean_data = df.filter((df.open != "undefined") & (df.high != "undefined") & (
     df.low != "undefined") & (df.close != "undefined"))
 
-clean_data = clean_data.withColumn(
-    "timestamp", clean_data.timestamp.cast('timestamp'))
+# clean_data = clean_data.withColumn(
+#     "timestamp", clean_data.timestamp.cast('timestamp'))
 
-clean_data = clean_data.withColumn(
-    "timestamp", functions.from_unixtime(functions.unix_timestamp(clean_data.timestamp), "dd-MM-yyyy"))
+# clean_data = clean_data.withColumn(
+#     "timestamp", functions.from_unixtime(functions.unix_timestamp(clean_data.timestamp), "dd-MM-yyyy"))
 
 # recast the columns as floats
+clean_data = clean_data.withColumn(
+    "timestamp", clean_data.timestamp.cast('bigint'))
 clean_data = clean_data.withColumn("open", clean_data.open.cast('float'))
 clean_data = clean_data.withColumn("high", clean_data.high.cast('float'))
 clean_data = clean_data.withColumn("low", clean_data.low.cast('float'))
