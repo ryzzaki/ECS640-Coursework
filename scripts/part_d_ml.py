@@ -15,12 +15,6 @@ df = sparkSession.read.csv(
 clean_data = df.filter((df.open != "undefined") & (df.high != "undefined") & (
     df.low != "undefined") & (df.close != "undefined"))
 
-# clean_data = clean_data.withColumn(
-#     "timestamp", clean_data.timestamp.cast('timestamp'))
-
-# clean_data = clean_data.withColumn(
-#     "timestamp", functions.from_unixtime(functions.unix_timestamp(clean_data.timestamp), "dd-MM-yyyy"))
-
 # recast the columns as floats
 clean_data = clean_data.withColumn(
     "timestamp", clean_data.timestamp.cast('bigint'))
@@ -30,26 +24,40 @@ clean_data = clean_data.withColumn("low", clean_data.low.cast('float'))
 clean_data = clean_data.withColumn("close", clean_data.close.cast('float'))
 
 # visual check that data are filtered
-clean_data.show()
+# clean_data.show()
 
 # create features vector
 feature_columns = clean_data.columns[:-1]  # here we omit the close column
 assembler = VectorAssembler(inputCols=feature_columns, outputCol="features")
-data_2 = assembler.transform(clean_data)
-# train/test split
-train, test = data_2.randomSplit([0.7, 0.3])
+transformed_data = assembler.transform(clean_data)
+
+# train/test random split
+train, test = transformed_data.randomSplit([0.7, 0.3])
+
 # define the model
 algo = LinearRegression(featuresCol="features", labelCol="close")
+
 # train the model
 model = algo.fit(train)
+
 # evaluation
 evaluation_summary = model.evaluate(test)
-evaluation_summary.meanAbsoluteError
-evaluation_summary.rootMeanSquaredError
-evaluation_summary.r2
+print("meanAbsoluteError: ", evaluation_summary.meanAbsoluteError)
+print("rootMeanSquaredError: ", evaluation_summary.rootMeanSquaredError)
+print("r2: ", evaluation_summary.r2)
+
 # predicting values
 predictions = model.transform(test)
 
-predictions.show()
+# show the predictions
+# predictions.show()
 
 print("Job ID: ", sc.applicationId)
+
+print("timestamp, open, high, low, close, features, prediction")
+all_predictions = predictions.collect()
+for p in all_predictions:
+    formated_date = datetime.utcfromtimestamp(
+        p[0]).strftime('%d/%m/%Y')
+    print("{}, {}, {}, {}, {}, {}, {}".format(
+        formated_date, p[1], p[2], p[3], p[4], p[5], p[6]))
