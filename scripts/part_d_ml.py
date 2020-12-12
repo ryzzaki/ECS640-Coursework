@@ -1,6 +1,6 @@
 from pyspark.ml.feature import VectorAssembler
 from pyspark import SparkContext
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, functions
 from pyspark.ml.regression import LinearRegression
 from datetime import datetime
 
@@ -15,12 +15,14 @@ df = sparkSession.read.csv(
 clean_data = df.filter((df.open != "undefined") & (df.high != "undefined") & (
     df.low != "undefined") & (df.close != "undefined"))
 
+clean_data = clean_data.withColumn(
+    "timestamp", functions.from_unixtime(functions.unix_timestamp(df.date), "dd-MM-yyyy"))
+
 # recast the columns as floats
-clean_data = clean_data.withColumn("timestamp", clean_data.open.cast('bigint'))
 clean_data = clean_data.withColumn("open", clean_data.open.cast('float'))
-clean_data = clean_data.withColumn("high", clean_data.open.cast('float'))
-clean_data = clean_data.withColumn("low", clean_data.open.cast('float'))
-clean_data = clean_data.withColumn("close", clean_data.open.cast('float'))
+clean_data = clean_data.withColumn("high", clean_data.high.cast('float'))
+clean_data = clean_data.withColumn("low", clean_data.low.cast('float'))
+clean_data = clean_data.withColumn("close", clean_data.close.cast('float'))
 
 # visual check that data are filtered
 clean_data.show()
