@@ -54,10 +54,10 @@ predictions = model.transform(test)
 
 print("Job ID: ", sc.applicationId)
 
-print("timestamp, open, high, low, close, features, prediction")
+print("timestamp,open,high,low,close,features,prediction")
 all_predictions = predictions.collect()
 for p in all_predictions:
     formated_date = datetime.utcfromtimestamp(
         p[0]).strftime('%d/%m/%Y')
-    print("{}, {}, {}, {}, {}, {}, {}".format(
+    print("{},{},{},{},{},{},{}".format(
         formated_date, p[1], p[2], p[3], p[4], p[5], p[6]))
