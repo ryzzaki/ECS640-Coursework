@@ -51,3 +51,5 @@ evaluation_summary.r2
 predictions = model.transform(test)
 
 predictions.show()
+
+print("Job ID: ", sc.applicationId)
