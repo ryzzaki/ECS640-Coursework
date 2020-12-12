@@ -16,7 +16,10 @@ clean_data = df.filter((df.open != "undefined") & (df.high != "undefined") & (
     df.low != "undefined") & (df.close != "undefined"))
 
 clean_data = clean_data.withColumn(
-    "timestamp", functions.from_unixtime(functions.unix_timestamp(df.date), "dd-MM-yyyy"))
+    "timestamp", clean_data.timestamp.cast('timestamp'))
+
+clean_data = clean_data.withColumn(
+    "timestamp", functions.from_unixtime(functions.unix_timestamp(clean_data.timestamp), "dd-MM-yyyy"))
 
 # recast the columns as floats
 clean_data = clean_data.withColumn("open", clean_data.open.cast('float'))
@@ -44,5 +47,5 @@ evaluation_summary.rootMeanSquaredError
 evaluation_summary.r2
 # predicting values
 predictions = model.transform(test)
-# here I am filtering out some columns just for the figure to fit
-predictions.select(predictions.columns[4:]).show()
+
+predictions.show()
