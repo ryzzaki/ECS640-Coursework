@@ -16,7 +16,7 @@ clean_data = df.filter((df.open != "undefined") & (df.high != "undefined") & (
     df.low != "undefined") & (df.close != "undefined"))
 
 # recast the columns as floats
-clean_data = clean_data.withColumn("timestamp", clean_data.open.cast('float'))
+clean_data = clean_data.withColumn("timestamp", clean_data.open.cast('bigint'))
 clean_data = clean_data.withColumn("open", clean_data.open.cast('float'))
 clean_data = clean_data.withColumn("high", clean_data.open.cast('float'))
 clean_data = clean_data.withColumn("low", clean_data.open.cast('float'))
